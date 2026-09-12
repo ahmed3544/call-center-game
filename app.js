@@ -14,35 +14,59 @@ const $=id=>document.getElementById(id);
 const format=s=>`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
 const msg=t=>{ $('lobbyMessage').textContent=t; $('lobbyMessage').classList.remove('hidden'); };
 const waitMsg=t=>{ $('waitingMessage').textContent=t; };
-function code(){return Math.random().toString(36).slice(2,7).toUpperCase();}
+function code(){return Math.random().toString(36).slice(2,8).toUpperCase();}
+function showDbError(prefix,error){
+  console.error(prefix,error);
+  const detail=error?.message||error?.details||error?.hint||error?.code||'خطأ غير معروف';
+  msg(`${prefix} ${detail}`);
+}
 
 async function createRoom(){
-  const name=$('createName').value.trim()||'لاعب'; const role=$('createRole').value; const roomCode=code();
-  const {data:r,error}=await db.from('cc_rooms').insert({code:roomCode}).select().single();
-  if(error){msg('حصل خطأ في إنشاء الغرفة.');console.error(error);return;}
-  const {data:p,error:pe}=await db.from('cc_players').insert({room_id:r.id,name,role}).select().single();
-  if(pe){msg('تعذر تسجيل اللاعب.');console.error(pe);return;}
-  me=p;room=r;await enterRoom();
+  const button=$('createRoomBtn');
+  button.disabled=true;
+  try{
+    const name=$('createName').value.trim()||'لاعب';
+    const role=$('createRole').value;
+    const roomCode=code();
+    // Insert first, then read the row back. This is more tolerant of PostgREST response issues.
+    const {error:insertError}=await db.from('cc_rooms').insert({code:roomCode});
+    if(insertError){showDbError('حصل خطأ في إنشاء الغرفة:',insertError);return;}
+    const {data:r,error:readError}=await db.from('cc_rooms').select('id,code,status,created_at').eq('code',roomCode).maybeSingle();
+    if(readError||!r){showDbError('تم إنشاء الغرفة لكن تعذر قراءتها:',readError||new Error('Room not found after insert'));return;}
+    const {data:p,error:pe}=await db.from('cc_players').insert({room_id:r.id,name,role}).select('id,room_id,name,role,score,joined_at').single();
+    if(pe){showDbError('تم إنشاء الغرفة لكن تعذر تسجيل اللاعب:',pe);return;}
+    me=p;room=r;await enterRoom();
+  }catch(error){showDbError('تعذر الاتصال بخدمة الغرف:',error);}
+  finally{button.disabled=false;}
 }
 async function joinRoom(){
-  const name=$('joinName').value.trim()||'لاعب';const role=$('joinRole').value;const roomCode=$('roomCode').value.trim().toUpperCase();
-  if(!roomCode){msg('اكتب كود الغرفة.');return;}
-  const {data:r,error}=await db.from('cc_rooms').select('*').eq('code',roomCode).single();
-  if(error||!r){msg('الغرفة غير موجودة.');return;} if(r.status!=='waiting'){msg('الشيفت بدأ بالفعل.');return;}
-  const {data:existing}=await db.from('cc_players').select('*').eq('room_id',r.id);
-  if((existing||[]).some(p=>p.role===role)){msg('الدور ده محجوز بالفعل. اختار دورًا آخر.');return;}
-  if((existing||[]).length>=3){msg('الغرفة مكتملة.');return;}
-  const {data:p,error:pe}=await db.from('cc_players').insert({room_id:r.id,name,role}).select().single();
-  if(pe){msg('تعذر دخول الغرفة.');console.error(pe);return;} me=p;room=r;await enterRoom();
+  const button=$('joinRoomBtn');
+  button.disabled=true;
+  try{
+    const name=$('joinName').value.trim()||'لاعب';const role=$('joinRole').value;const roomCode=$('roomCode').value.trim().toUpperCase();
+    if(!roomCode){msg('اكتب كود الغرفة.');return;}
+    const {data:r,error}=await db.from('cc_rooms').select('*').eq('code',roomCode).maybeSingle();
+    if(error){showDbError('تعذر البحث عن الغرفة:',error);return;}
+    if(!r){msg('الغرفة غير موجودة.');return;} if(r.status!=='waiting'){msg('الشيفت بدأ بالفعل.');return;}
+    const {data:existing,error:existingError}=await db.from('cc_players').select('*').eq('room_id',r.id);
+    if(existingError){showDbError('تعذر قراءة لاعبي الغرفة:',existingError);return;}
+    if((existing||[]).some(p=>p.role===role)){msg('الدور ده محجوز بالفعل. اختار دورًا آخر.');return;}
+    if((existing||[]).length>=3){msg('الغرفة مكتملة.');return;}
+    const {data:p,error:pe}=await db.from('cc_players').insert({room_id:r.id,name,role}).select().single();
+    if(pe){showDbError('تعذر دخول الغرفة:',pe);return;} me=p;room=r;await enterRoom();
+  }catch(error){showDbError('تعذر الاتصال بخدمة الغرف:',error);}
+  finally{button.disabled=false;}
 }
 async function enterRoom(){ $('lobby').classList.add('hidden');$('waiting').classList.remove('hidden');$('roomCodeDisplay').textContent=room.code;await refresh();waitMsg('في انتظار Agent + Quality + Team Leader.'); }
 
 async function refresh(){
   if(!room)return;
-  const {data:ps}=await db.from('cc_players').select('*').eq('room_id',room.id).order('joined_at');players=ps||[];
-  const {data:es}=await db.from('cc_events').select('*').eq('room_id',room.id).gt('id',lastEventId).order('id');
+  const {data:ps,error:playersError}=await db.from('cc_players').select('*').eq('room_id',room.id).order('joined_at');
+  if(playersError){console.error(playersError);return;} players=ps||[];
+  const {data:es,error:eventsError}=await db.from('cc_events').select('*').eq('room_id',room.id).gt('id',lastEventId).order('id');
+  if(eventsError){console.error(eventsError);return;}
   (es||[]).forEach(applyEvent);if(es?.length)lastEventId=es[es.length-1].id;
-  const {data:r}=await db.from('cc_rooms').select('*').eq('id',room.id).single();if(r)room=r;
+  const {data:r}=await db.from('cc_rooms').select('*').eq('id',room.id).maybeSingle();if(r)room=r;
   renderWaiting();if(room.status==='playing')renderGame();
 }
 function renderWaiting(){
@@ -51,7 +75,7 @@ function renderWaiting(){
 }
 async function startRoom(){
   const ready=new Set(players.map(p=>p.role));if(players.length!==3||!ready.has('agent')||!ready.has('quality')||!ready.has('leader')){waitMsg('لازم 3 لاعبين بالضبط: Agent + Quality + Team Leader.');return;}
-  const {error}=await db.from('cc_rooms').update({status:'playing'}).eq('id',room.id);if(error){waitMsg('تعذر بدء الشيفت.');return;}await refresh();
+  const {error}=await db.from('cc_rooms').update({status:'playing'}).eq('id',room.id);if(error){waitMsg(`تعذر بدء الشيفت: ${error.message||'خطأ غير معروف'}`);return;}await refresh();
 }
 function applyEvent(e){
   if(e.type==='answer'){callIndex=e.payload.callIndex;answerType=e.payload.type;answered=true;score=e.payload.score;csat=e.payload.csat;ahtTotal=e.payload.ahtTotal;showAnswered();}
@@ -72,18 +96,18 @@ function renderCall(){
 }
 async function answer(type){
   if(me.role!=='agent'||answered)return;const duration=Math.max(1,Math.round((Date.now()-answerAt)/1000));ahtTotal+=duration;score=Math.max(0,score+(type==='good'?2:-12));csat=Math.max(0,csat+(type==='good'?0:-15));
-  await db.from('cc_events').insert({room_id:room.id,player_id:me.id,type:'answer',payload:{callIndex,type,score,csat,ahtTotal}});await refresh();
+  const {error}=await db.from('cc_events').insert({room_id:room.id,player_id:me.id,type:'answer',payload:{callIndex,type,score,csat,ahtTotal}});if(error){showDbError('تعذر حفظ رد المكالمة:',error);return;}await refresh();
 }
 function showAnswered(){
   $('choices').innerHTML='';$('status').textContent='تم رد Agent — الآن دور Quality ثم Team Leader';$('feedback').textContent=answerType==='good'?'✅ Agent قدم ردًا احترافيًا.':'⚠️ الرد يحتاج Coaching.';$('feedback').classList.remove('hidden');
   if(me.role==='quality')showQualityPanel();if(me.role==='leader')showLeaderPanel();$('quality').textContent=`${Math.round((score+qualityScore)/2)}%`;$('csat').textContent=`${csat}%`;
 }
 function showQualityPanel(){ $('qualityPanel').classList.remove('hidden');$('qualityPanel').innerHTML=`<h3>🔍 Quality — ${escapeHtml(me.name)}</h3><p>قيّم المكالمة الحالية.</p><div class="panel-actions"><button class="role-good" onclick="qualityVote('pass')">✅ Pass</button><button class="role-bad" onclick="qualityVote('fail')">❌ Fail</button></div>`; }
-async function qualityVote(vote){if(me.role!=='quality')return;qualityScore=Math.max(0,qualityScore+(vote==='pass'?2:-8));await db.from('cc_events').insert({room_id:room.id,player_id:me.id,type:'quality',payload:{vote,qualityScore}});await refresh();}
+async function qualityVote(vote){if(me.role!=='quality')return;qualityScore=Math.max(0,qualityScore+(vote==='pass'?2:-8));const {error}=await db.from('cc_events').insert({room_id:room.id,player_id:me.id,type:'quality',payload:{vote,qualityScore}});if(error){showDbError('تعذر حفظ تقييم Quality:',error);return;}await refresh();}
 function showQualityResult(vote){$('qualityPanel').classList.remove('hidden');$('qualityPanel').innerHTML=`<h3>🔍 Quality</h3><p>${vote==='pass'?'✅ Pass — المكالمة مقبولة.':'❌ Fail — تم تسجيل ملاحظة جودة.'}</p>`;}
 function showLeaderPanel(){ $('leaderPanel').classList.remove('hidden');$('leaderPanel').innerHTML=`<h3>👔 Team Leader — ${escapeHtml(me.name)}</h3><p>اختار قرار الـ Coaching.</p><div class="panel-actions"><button class="role-good" onclick="leaderVote('coach')">💬 Coaching</button><button class="role-bad" onclick="leaderVote('escalate')">🚨 Escalate</button></div>`; }
-async function leaderVote(action){if(me.role!=='leader')return;leaderScore=Math.max(0,leaderScore+(action==='coach'?2:-3));await db.from('cc_events').insert({room_id:room.id,player_id:me.id,type:'leader',payload:{action,leaderScore}});await refresh();}
+async function leaderVote(action){if(me.role!=='leader')return;leaderScore=Math.max(0,leaderScore+(action==='coach'?2:-3));const {error}=await db.from('cc_events').insert({room_id:room.id,player_id:me.id,type:'leader',payload:{action,leaderScore}});if(error){showDbError('تعذر حفظ قرار Team Leader:',error);return;}await refresh();}
 function showLeaderResult(action){$('leaderPanel').classList.remove('hidden');$('leaderPanel').innerHTML=`<h3>👔 Team Leader</h3><p>${action==='coach'?'💬 Coaching — تم دعم الـ Agent.':'🚨 Escalation — تم تصعيد الحالة.'}</p>`;if(me.role==='leader')setTimeout(nextCall,350);}
-async function nextCall(){await db.from('cc_events').insert({room_id:room.id,player_id:me.id,type:'next',payload:{callIndex:callIndex+1}});await refresh();}
+async function nextCall(){const {error}=await db.from('cc_events').insert({room_id:room.id,player_id:me.id,type:'next',payload:{callIndex:callIndex+1}});if(error){showDbError('تعذر بدء المكالمة التالية:',error);return;}await refresh();}
 function escapeHtml(s){return String(s).replace(/[&<>'\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'}[c]));}
 $('createRoomBtn').onclick=createRoom;$('joinRoomBtn').onclick=joinRoom;$('startRoomBtn').onclick=startRoom;setInterval(refresh,1500);
