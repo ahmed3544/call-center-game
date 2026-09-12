@@ -10,20 +10,45 @@
   <main class="app">
     <header class="topbar">
       <div><span class="eyebrow">CALL CENTER MULTIPLAYER</span><h1>شيفت خدمة العملاء</h1></div>
-      <div class="agent">🎧 <span id="currentRole">Lobby</span></div>
+      <div class="agent"><span id="currentRole">🌐 Lobby</span></div>
     </header>
 
     <section id="lobby" class="game-card lobby-card">
-      <div class="status"><span></span> 🎮 إنشاء الشيفت</div>
-      <div class="scenario compact"><div class="phone">👥</div><h2>اختاروا أدوار اللاعبين</h2><p>اللعبة تدعم من 2 إلى 5 لاعبين. كل لاعب يختار اسم ودور.</p></div>
-      <div id="playersForm" class="players-form"></div>
-      <button id="addPlayerBtn" class="secondary">＋ إضافة لاعب</button>
-      <button id="startGameBtn" class="primary">🚀 بدء الشيفت</button>
-      <div class="roles-help">
-        <span>🎧 <b>Agent</b> يستقبل المكالمات</span>
-        <span>🔍 <b>Quality</b> يراجع الجودة</span>
-        <span>👔 <b>Team Leader</b> يدير الفريق</span>
+      <div class="status"><span></span> 🎮 Multiplayer Lobby</div>
+      <div class="scenario compact"><div class="phone">👥</div><h2>العبوا من أجهزة مختلفة</h2><p>اعمل Room أو ادخل بكود غرفة. كل لاعب يختار دورًا مستقلًا.</p></div>
+      <div class="room-actions">
+        <div class="room-box">
+          <h3>إنشاء غرفة</h3>
+          <input id="createName" placeholder="اسمك" maxlength="20" />
+          <select id="createRole">
+            <option value="agent">🎧 Agent</option>
+            <option value="quality">🔍 Quality</option>
+            <option value="leader">👔 Team Leader</option>
+          </select>
+          <button id="createRoomBtn" class="primary">🚀 إنشاء Room</button>
+        </div>
+        <div class="room-box">
+          <h3>دخول غرفة</h3>
+          <input id="joinName" placeholder="اسمك" maxlength="20" />
+          <input id="roomCode" placeholder="كود الغرفة" maxlength="8" />
+          <select id="joinRole">
+            <option value="agent">🎧 Agent</option>
+            <option value="quality">🔍 Quality</option>
+            <option value="leader">👔 Team Leader</option>
+          </select>
+          <button id="joinRoomBtn" class="secondary">🔗 دخول Room</button>
+        </div>
       </div>
+      <div id="lobbyMessage" class="feedback hidden"></div>
+    </section>
+
+    <section id="waiting" class="game-card hidden lobby-card">
+      <div class="status"><span></span> 🟢 Room مفتوحة</div>
+      <div class="room-code" id="roomCodeDisplay">----</div>
+      <p class="center muted">ابعت الكود للاعبين الآخرين من أجهزتهم.</p>
+      <div id="waitingPlayers" class="players-board"></div>
+      <button id="startRoomBtn" class="primary">🚀 بدء الشيفت</button>
+      <div id="waitingMessage" class="feedback"></div>
     </section>
 
     <section id="game" class="hidden">
@@ -35,18 +60,18 @@
         <div><span>AHT</span><strong id="aht">00:00</strong></div>
       </section>
       <section class="game-card">
-        <div class="status"><span></span><span id="status">جاهز لاستقبال المكالمة</span></div>
+        <div class="status"><span></span><span id="status">جاري تجهيز الشيفت...</span></div>
         <div id="turnInfo" class="turn-info"></div>
         <div id="caller" class="caller hidden"></div>
-        <div id="scenario" class="scenario"><div class="phone">📞</div><h2>جاهزين؟</h2><p>ابدأوا أول مكالمة.</p></div>
+        <div id="scenario" class="scenario"><div class="phone">📞</div><h2>جاهزين؟</h2><p>انتظروا بداية المكالمة.</p></div>
         <div id="choices" class="choices"></div>
-        <button id="answerBtn" class="primary">📞 استقبال المكالمة</button>
         <div id="qualityPanel" class="role-panel hidden"></div>
         <div id="leaderPanel" class="role-panel hidden"></div>
         <div id="feedback" class="feedback hidden"></div>
       </section>
     </section>
   </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>
 </body>
 </html>
