@@ -1,80 +1,36 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Call Center Multiplayer</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
+<head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Call Center Simulator</title><link rel="stylesheet" href="style.css" /></head>
 <body>
-  <main class="app">
-    <header class="topbar">
-      <div><span class="eyebrow">CALL CENTER SIMULATOR</span><h1>شيفت خدمة العملاء</h1></div>
-      <div class="agent"><span id="currentRole">🌐 Lobby</span></div>
-    </header>
-
-    <section id="lobby" class="game-card lobby-card">
-      <div class="status"><span></span> 🎮 اختر طريقة اللعب</div>
-      <div class="scenario compact"><div class="phone">🎧</div><h2>العب لوحدك أو مع لاعبين</h2><p>في الوضع الفردي الكمبيوتر يقوم بدور Quality و Team Leader. ووضع Multiplayer يتيح اللعب من أجهزة مختلفة.</p></div>
-      <div class="room-actions">
-        <div class="room-box">
-          <h3>🎯 وضع فردي</h3>
-          <input id="soloName" placeholder="اسمك" maxlength="20" />
-          <button id="soloBtn" class="primary">▶️ العب مع الكمبيوتر</button>
-          <p class="muted">بدون Room وبدون الحاجة لقاعدة البيانات.</p>
-        </div>
-        <div class="room-box">
-          <h3>🌐 Multiplayer</h3>
-          <input id="createName" placeholder="اسمك" maxlength="20" />
-          <select id="createRole">
-            <option value="agent">🎧 Agent</option>
-            <option value="quality">🔍 Quality</option>
-            <option value="leader">👔 Team Leader</option>
-          </select>
-          <button id="createRoomBtn" class="primary">🚀 إنشاء Room</button>
-          <input id="joinName" placeholder="اسمك للدخول" maxlength="20" />
-          <input id="roomCode" placeholder="كود الغرفة" maxlength="8" />
-          <select id="joinRole">
-            <option value="agent">🎧 Agent</option>
-            <option value="quality">🔍 Quality</option>
-            <option value="leader">👔 Team Leader</option>
-          </select>
-          <button id="joinRoomBtn" class="secondary">🔗 دخول Room</button>
-        </div>
-      </div>
-      <div id="lobbyMessage" class="feedback hidden"></div>
-    </section>
-
-    <section id="waiting" class="game-card hidden lobby-card">
-      <div class="status"><span></span> 🟢 Room مفتوحة</div>
-      <div class="room-code" id="roomCodeDisplay">----</div>
-      <p class="center muted">ابعت الكود للاعبين الآخرين من أجهزتهم.</p>
-      <div id="waitingPlayers" class="players-board"></div>
-      <button id="startRoomBtn" class="primary">🚀 بدء الشيفت</button>
-      <div id="waitingMessage" class="feedback"></div>
-    </section>
-
-    <section id="game" class="hidden">
-      <section class="players-board" id="playersBoard"></section>
-      <section class="stats">
-        <div><span>المكالمات</span><strong id="calls">0</strong></div>
-        <div><span>CSAT</span><strong id="csat">100%</strong></div>
-        <div><span>Quality</span><strong id="quality">100%</strong></div>
-        <div><span>AHT</span><strong id="aht">00:00</strong></div>
-      </section>
-      <section class="game-card">
-        <div class="status"><span></span><span id="status">جاري تجهيز الشيفت...</span></div>
-        <div id="turnInfo" class="turn-info"></div>
-        <div id="caller" class="caller hidden"></div>
-        <div id="scenario" class="scenario"><div class="phone">📞</div><h2>جاهزين؟</h2><p>انتظروا بداية المكالمة.</p></div>
-        <div id="choices" class="choices"></div>
-        <div id="qualityPanel" class="role-panel hidden"></div>
-        <div id="leaderPanel" class="role-panel hidden"></div>
-        <div id="feedback" class="feedback hidden"></div>
-      </section>
-    </section>
-  </main>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="app.js"></script>
-</body>
-</html>
+<main class="app">
+<header class="topbar"><div><span class="eyebrow">CALL CENTER SIMULATOR</span><h1>شيفت خدمة العملاء</h1></div><div class="agent"><span id="currentRole">🌐 Lobby</span></div></header>
+<section id="lobby" class="game-card lobby-card"><div class="status"><span></span> 🎮 اختر طريقة اللعب</div><div class="scenario compact"><div class="phone">🎧</div><h2>العب لوحدك أو مع لاعبين</h2><p>الوضع الفردي يعمل بالكامل من جهازك والكمبيوتر يقوم بدور Quality و Team Leader.</p></div>
+<div class="room-actions">
+<div class="room-box"><h3>🎯 وضع فردي</h3><input id="soloName" placeholder="اسمك" maxlength="20" /><button id="soloBtn" class="primary">▶️ العب مع الكمبيوتر</button><p class="muted">بدون Room وبدون Supabase.</p></div>
+<div class="room-box"><h3>🌐 Multiplayer</h3><input id="createName" placeholder="اسمك" maxlength="20" /><select id="createRole"><option value="agent">🎧 Agent</option><option value="quality">🔍 Quality</option><option value="leader">👔 Team Leader</option></select><button id="createRoomBtn" class="primary">🚀 إنشاء Room</button><input id="joinName" placeholder="اسمك للدخول" maxlength="20" /><input id="roomCode" placeholder="كود الغرفة" maxlength="8" /><select id="joinRole"><option value="agent">🎧 Agent</option><option value="quality">🔍 Quality</option><option value="leader">👔 Team Leader</option></select><button id="joinRoomBtn" class="secondary">🔗 دخول Room</button></div>
+</div><div id="lobbyMessage" class="feedback hidden"></div></section>
+<section id="waiting" class="game-card hidden lobby-card"><div class="status"><span></span> 🟢 Room مفتوحة</div><div class="room-code" id="roomCodeDisplay">----</div><p class="center muted">ابعت الكود للاعبين الآخرين من أجهزتهم.</p><div id="waitingPlayers" class="players-board"></div><button id="startRoomBtn" class="primary">🚀 بدء الشيفت</button><div id="waitingMessage" class="feedback"></div></section>
+<section id="game" class="hidden"><section class="players-board" id="playersBoard"></section><section class="stats"><div><span>المكالمات</span><strong id="calls">0</strong></div><div><span>CSAT</span><strong id="csat">100%</strong></div><div><span>Quality</span><strong id="quality">100%</strong></div><div><span>AHT</span><strong id="aht">00:00</strong></div></section><section class="game-card"><div class="status"><span></span><span id="status">جاري تجهيز الشيفت...</span></div><div id="turnInfo" class="turn-info"></div><div id="caller" class="caller hidden"></div><div id="scenario" class="scenario"><div class="phone">📞</div><h2>جاهزين؟</h2><p>انتظروا بداية المكالمة.</p></div><div id="choices" class="choices"></div><div id="qualityPanel" class="role-panel hidden"></div><div id="leaderPanel" class="role-panel hidden"></div><div id="feedback" class="feedback hidden"></div></section></section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="app.js"></script>
+<script>
+(function(){
+  const soloBtn=document.getElementById('soloBtn');
+  soloBtn.onclick=function(){
+    const name=(document.getElementById('soloName').value||'Agent').trim();
+    window.__solo={name,call:0,answered:false,score:100,csat:100,quality:100,leader:100,start:Date.now()};
+    document.getElementById('lobby').classList.add('hidden');document.getElementById('game').classList.remove('hidden');
+    document.getElementById('currentRole').textContent='🎧 '+name+' — Agent';
+    document.getElementById('playersBoard').innerHTML='<div class="player-card agent"><div class="player-icon">🎧</div><div><strong>'+name+'</strong><small>Agent</small></div></div><div class="player-card quality"><div class="player-icon">🤖</div><div><strong>Quality</strong><small>Computer</small></div></div><div class="player-card leader"><div class="player-icon">🤖</div><div><strong>Team Leader</strong><small>Computer</small></div></div>';
+    soloCall();
+  };
+  function soloCall(){
+    const s=window.__solo,c=calls[s.call%calls.length];s.answered=false;s.start=Date.now();
+    document.getElementById('calls').textContent=s.call+1;document.getElementById('csat').textContent=s.csat+'%';document.getElementById('quality').textContent=Math.round((s.score+s.quality+s.leader)/3)+'%';document.getElementById('aht').textContent='00:00';
+    document.getElementById('status').textContent='مكالمة واردة — اختار أفضل رد';document.getElementById('turnInfo').textContent='🤖 الكمبيوتر يدير Quality و Team Leader تلقائيًا';document.getElementById('caller').textContent='📞 العميل: '+c.name;document.getElementById('caller').classList.remove('hidden');document.getElementById('scenario').innerHTML='<h2>مشكلة العميل</h2><p>"'+c.issue+'"</p>';document.getElementById('qualityPanel').classList.add('hidden');document.getElementById('leaderPanel').classList.add('hidden');document.getElementById('feedback').classList.add('hidden');
+    const choices=document.getElementById('choices');choices.innerHTML='';c.answers.forEach(([text,type])=>{const b=document.createElement('button');b.className='choice';b.textContent=text;b.onclick=()=>soloAnswer(type);choices.appendChild(b)});
+  }
+  function soloAnswer(type){const s=window.__solo;if(s.answered)return;s.answered=true;const good=type==='good';s.score=Math.max(0,s.score+(good?2:-12));s.csat=Math.max(0,s.csat+(good?0:-15));s.quality=Math.max(0,s.quality+(good?2:-8));s.leader=Math.max(0,s.leader+(good?2:-3));document.getElementById('choices').innerHTML='';document.getElementById('status').textContent='🤖 الكمبيوتر بيقيّم المكالمة...';document.getElementById('qualityPanel').classList.remove('hidden');document.getElementById('qualityPanel').innerHTML='<h3>🔍 Quality (Computer)</h3><p>'+(good?'✅ Pass — رد احترافي.':'❌ Fail — الرد يحتاج Coaching.')+'</p>';setTimeout(()=>{document.getElementById('leaderPanel').classList.remove('hidden');document.getElementById('leaderPanel').innerHTML='<h3>👔 Team Leader (Computer)</h3><p>'+(good?'💬 ممتاز! استمر على نفس الأسلوب.':'🎯 Coaching: استخدم التعاطف وتحمل المسؤولية وقدّم حلًا واضحًا.')+'</p>';document.getElementById('feedback').textContent=good?'🏆 ممتاز!':'⚠️ المكالمة أثرت على CSAT وQuality.';document.getElementById('feedback').classList.remove('hidden');document.getElementById('quality').textContent=Math.round((s.score+s.quality+s.leader)/3)+'%';document.getElementById('csat').textContent=s.csat+'%';const n=document.createElement('button');n.className='primary';n.textContent='➡️ المكالمة التالية';n.onclick=()=>{s.call++;soloCall()};document.getElementById('feedback').appendChild(n)},500)}
+})();
+</script>
+</body></html>
