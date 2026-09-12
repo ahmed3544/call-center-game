@@ -9,16 +9,22 @@
 <body>
   <main class="app">
     <header class="topbar">
-      <div><span class="eyebrow">CALL CENTER MULTIPLAYER</span><h1>شيفت خدمة العملاء</h1></div>
+      <div><span class="eyebrow">CALL CENTER SIMULATOR</span><h1>شيفت خدمة العملاء</h1></div>
       <div class="agent"><span id="currentRole">🌐 Lobby</span></div>
     </header>
 
     <section id="lobby" class="game-card lobby-card">
-      <div class="status"><span></span> 🎮 Multiplayer Lobby</div>
-      <div class="scenario compact"><div class="phone">👥</div><h2>العبوا من أجهزة مختلفة</h2><p>اعمل Room أو ادخل بكود غرفة. كل لاعب يختار دورًا مستقلًا.</p></div>
+      <div class="status"><span></span> 🎮 اختر طريقة اللعب</div>
+      <div class="scenario compact"><div class="phone">🎧</div><h2>العب لوحدك أو مع لاعبين</h2><p>في الوضع الفردي الكمبيوتر يقوم بدور Quality و Team Leader. ووضع Multiplayer يتيح اللعب من أجهزة مختلفة.</p></div>
       <div class="room-actions">
         <div class="room-box">
-          <h3>إنشاء غرفة</h3>
+          <h3>🎯 وضع فردي</h3>
+          <input id="soloName" placeholder="اسمك" maxlength="20" />
+          <button id="soloBtn" class="primary">▶️ العب مع الكمبيوتر</button>
+          <p class="muted">بدون Room وبدون الحاجة لقاعدة البيانات.</p>
+        </div>
+        <div class="room-box">
+          <h3>🌐 Multiplayer</h3>
           <input id="createName" placeholder="اسمك" maxlength="20" />
           <select id="createRole">
             <option value="agent">🎧 Agent</option>
@@ -26,10 +32,7 @@
             <option value="leader">👔 Team Leader</option>
           </select>
           <button id="createRoomBtn" class="primary">🚀 إنشاء Room</button>
-        </div>
-        <div class="room-box">
-          <h3>دخول غرفة</h3>
-          <input id="joinName" placeholder="اسمك" maxlength="20" />
+          <input id="joinName" placeholder="اسمك للدخول" maxlength="20" />
           <input id="roomCode" placeholder="كود الغرفة" maxlength="8" />
           <select id="joinRole">
             <option value="agent">🎧 Agent</option>
