@@ -3,28 +3,48 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Call Center Simulator</title>
+  <title>Call Center Multiplayer</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <main class="app">
     <header class="topbar">
-      <div><span class="eyebrow">CALL CENTER SIMULATOR</span><h1>شيفت خدمة العملاء</h1></div>
-      <div class="agent">🎧 <span>Agent Ahmed</span></div>
+      <div><span class="eyebrow">CALL CENTER MULTIPLAYER</span><h1>شيفت خدمة العملاء</h1></div>
+      <div class="agent">🎧 <span id="currentRole">Lobby</span></div>
     </header>
-    <section class="stats">
-      <div><span>المكالمات</span><strong id="calls">0</strong></div>
-      <div><span>CSAT</span><strong id="csat">100%</strong></div>
-      <div><span>Quality</span><strong id="quality">100%</strong></div>
-      <div><span>AHT</span><strong id="aht">00:00</strong></div>
+
+    <section id="lobby" class="game-card lobby-card">
+      <div class="status"><span></span> 🎮 إنشاء الشيفت</div>
+      <div class="scenario compact"><div class="phone">👥</div><h2>اختاروا أدوار اللاعبين</h2><p>اللعبة تدعم من 2 إلى 5 لاعبين. كل لاعب يختار اسم ودور.</p></div>
+      <div id="playersForm" class="players-form"></div>
+      <button id="addPlayerBtn" class="secondary">＋ إضافة لاعب</button>
+      <button id="startGameBtn" class="primary">🚀 بدء الشيفت</button>
+      <div class="roles-help">
+        <span>🎧 <b>Agent</b> يستقبل المكالمات</span>
+        <span>🔍 <b>Quality</b> يراجع الجودة</span>
+        <span>👔 <b>Team Leader</b> يدير الفريق</span>
+      </div>
     </section>
-    <section class="game-card">
-      <div class="status"><span id="statusDot"></span><span id="status">جاهز لاستقبال المكالمة</span></div>
-      <div id="caller" class="caller hidden"></div>
-      <div id="scenario" class="scenario"><div class="phone">📞</div><h2>جاهز؟</h2><p>اضغط على الزر لاستقبال أول مكالمة.</p></div>
-      <div id="choices" class="choices"></div>
-      <button id="answerBtn" class="primary">📞 استقبال المكالمة</button>
-      <div id="feedback" class="feedback hidden"></div>
+
+    <section id="game" class="hidden">
+      <section class="players-board" id="playersBoard"></section>
+      <section class="stats">
+        <div><span>المكالمات</span><strong id="calls">0</strong></div>
+        <div><span>CSAT</span><strong id="csat">100%</strong></div>
+        <div><span>Quality</span><strong id="quality">100%</strong></div>
+        <div><span>AHT</span><strong id="aht">00:00</strong></div>
+      </section>
+      <section class="game-card">
+        <div class="status"><span></span><span id="status">جاهز لاستقبال المكالمة</span></div>
+        <div id="turnInfo" class="turn-info"></div>
+        <div id="caller" class="caller hidden"></div>
+        <div id="scenario" class="scenario"><div class="phone">📞</div><h2>جاهزين؟</h2><p>ابدأوا أول مكالمة.</p></div>
+        <div id="choices" class="choices"></div>
+        <button id="answerBtn" class="primary">📞 استقبال المكالمة</button>
+        <div id="qualityPanel" class="role-panel hidden"></div>
+        <div id="leaderPanel" class="role-panel hidden"></div>
+        <div id="feedback" class="feedback hidden"></div>
+      </section>
     </section>
   </main>
   <script src="app.js"></script>
