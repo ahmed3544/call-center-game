@@ -1,0 +1,1 @@
+// Solo mode is intentionally client-only: no Supabase room is required.
