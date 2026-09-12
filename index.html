@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Call Center Simulator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div><span class="eyebrow">CALL CENTER SIMULATOR</span><h1>شيفت خدمة العملاء</h1></div>
+      <div class="agent">🎧 <span>Agent Ahmed</span></div>
+    </header>
+    <section class="stats">
+      <div><span>المكالمات</span><strong id="calls">0</strong></div>
+      <div><span>CSAT</span><strong id="csat">100%</strong></div>
+      <div><span>Quality</span><strong id="quality">100%</strong></div>
+      <div><span>AHT</span><strong id="aht">00:00</strong></div>
+    </section>
+    <section class="game-card">
+      <div class="status"><span id="statusDot"></span><span id="status">جاهز لاستقبال المكالمة</span></div>
+      <div id="caller" class="caller hidden"></div>
+      <div id="scenario" class="scenario"><div class="phone">📞</div><h2>جاهز؟</h2><p>اضغط على الزر لاستقبال أول مكالمة.</p></div>
+      <div id="choices" class="choices"></div>
+      <button id="answerBtn" class="primary">📞 استقبال المكالمة</button>
+      <div id="feedback" class="feedback hidden"></div>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
